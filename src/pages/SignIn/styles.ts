@@ -42,9 +42,10 @@ align-items:center;
 flex-direction:row;
 `;
 
-export const CreatAccountButtonText = styled.Text`
+export const CreateAccountButtonText = styled.Text`
 color:#FF9000;
 font-size:18px;
 font-family: 'RobotoSlab-regular';
 margin-left:16px;
 `;
+
