@@ -1,4 +1,4 @@
-import React, { useEffect, useRef,useImperativeHandle,forwardRef } from 'react';
+import React, { useEffect, useState, useCallback, useRef, useImperativeHandle, forwardRef } from 'react';
 import { TextInputProps } from 'react-native';
 import { useField } from '@unform/core';
 
@@ -17,13 +17,23 @@ interface InputRef {
 }
 
 const Input: React.RefForwardingComponent<InputRef, InputProps> = ({ name, icon, ...rest }, ref) => {
+    const [isFocused, setIsFocused] = useState(false);
+    const [isFilled, setIsFilled] = useState(false);
     const inputElementRef = useRef<any>(null);
     const { registerField, defaultValue = '', fieldName, error } = useField(name);
     const inputValueRef = useRef<InputValueReference>({ value: defaultValue });
 
+    const handleInputFocus = useCallback(() => {
+        setIsFocused(true);
+    }, []);
+    const handleInputBluer = useCallback(() => {
+        setIsFocused(false);
 
-    useImperativeHandle(ref,() =>({
-        focus(){
+        setIsFilled(!!inputValueRef.current.value);
+    }, []);
+
+    useImperativeHandle(ref, () => ({
+        focus() {
             inputElementRef.current.focus();
         }
     }));
@@ -44,12 +54,18 @@ const Input: React.RefForwardingComponent<InputRef, InputProps> = ({ name, icon,
     })
 
     return (
-        <Container>
-            <Icon name={icon} size={20} color="#666360" />
+        <Container isFocused={isFocused}>
+            <Icon
+                name={icon}
+                size={20}
+                color={isFocused || isFilled ? '#ff9000' : '#666360'} />
             <TextInput
                 ref={inputElementRef}
                 keyboardAppearance="dark"
                 placeholderTextColor="#666360"
+                defaultValue={defaultValue}
+                onFocus={handleInputFocus}
+                onBlur={handleInputBluer}
                 onChangeText={(value) => {
                     inputValueRef.current.value = value;
                 }}
@@ -61,4 +77,4 @@ const Input: React.RefForwardingComponent<InputRef, InputProps> = ({ name, icon,
 }
 
 
-export default  forwardRef(Input);
+export default forwardRef(Input);
