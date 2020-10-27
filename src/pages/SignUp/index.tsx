@@ -55,7 +55,7 @@ const SignUp: React.FC = () => {
 
                     return;
                 }
-                Alert.alert('Erro na autenticação', 'Ocorreu um erro ao fazer o login, confira as informações');
+                Alert.alert('Erro na autenticação', 'Ocorreu um erro ao criar sua conta, tente novamente');
             }
         }, [navigation]);
 
