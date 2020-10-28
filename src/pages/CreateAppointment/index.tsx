@@ -1,7 +1,8 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useAuth } from '../../hooks/auth';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { format } from 'date-fns';
 import {
     Container, Header, BackButton, HeaderTitle, UserAvatar,
     ProvidersListContainer, ProvidersList,
@@ -53,6 +54,26 @@ const CreateAppointment: React.FC = () => {
         })
     }, [selectedDate, selectedProvider]);
 
+    const morningAvailability = useMemo(() => {
+        return availability.filter(({ hour }) => hour < 12)
+            .map(({ hour, available }) => {
+                return {
+                    hour, available,
+                    hourFormatted: format(new Date().setHours(hour), 'HH:00'),
+                };
+            })
+    }, [availability]);
+
+    const afternoonAvailability = useMemo(() => {
+        return availability.filter(({ hour }) => hour >= 12)
+            .map(({ hour, available }) => {
+                return {
+                    hour, available,
+                    hourFormatted: format(new Date().setHours(hour), 'HH:00'),
+                };
+            })
+    }, [availability]);
+
     const handleSelectProvider = useCallback((providerId: string) => {
         setSelectedProvider(providerId);
     }, []);
@@ -95,14 +116,22 @@ const CreateAppointment: React.FC = () => {
                 <OpenDatePickerButton onPress={handleToggleDatePicker}>
                     <OpenDatePickerButtonText>Selecionar outra data</OpenDatePickerButtonText>
                 </OpenDatePickerButton>
-                {showDatePicker && <DateTimePicker
+                {showDatePicker && (<DateTimePicker
                     mode="date"
                     display="calendar"
                     onChange={handleDateChanged}
                     textColor="#f4ede8"
-                    value={selectedDate} />}
-
+                    value={selectedDate}
+                />
+                )}
             </Calendar>
+            {morningAvailability.map(({ hourFormatted }) => (
+                <Title key={hourFormatted}>{hourFormatted}</Title>
+            ))}
+
+            {afternoonAvailability.map(({ hourFormatted }) => (
+                <Title key={hourFormatted}>{hourFormatted}</Title>
+            ))}
         </Container>
     )
 }
