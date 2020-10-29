@@ -47,6 +47,7 @@ const Dashboard: React.FC = () => {
                 </HeaderTitle>
                 <ProfileButton onPress={navigateToProfile}>
                     <UserAvatar source={{ uri: user.avatar_url }} />
+                    {console.log('endereço do uri: ', user.avatar_url)}
                 </ProfileButton>
             </Header>
             <ProvidersList

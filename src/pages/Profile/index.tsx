@@ -1,6 +1,7 @@
 import React, { useRef, useCallback } from 'react';
 import { KeyboardAvoidingView, Platform, View, ScrollView, TextInput, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import ImagePicker from 'react-native-image-picker';
 
 import { Form } from '@unform/mobile';
 import { FormHandles } from '@unform/core';
@@ -26,8 +27,8 @@ interface ProfileFormData {
 const Profile: React.FC = () => {
 
     const { user, updateUser } = useAuth();
-    const formRef = useRef<FormHandles>(null);
     const navigation = useNavigation();
+    const formRef = useRef<FormHandles>(null);
     const emailInputRef = useRef<TextInput>(null);
     const OldPasswordInputRef = useRef<TextInput>(null);
     const passwordInputRef = useRef<TextInput>(null);
@@ -90,6 +91,33 @@ const Profile: React.FC = () => {
             }
         }, [navigation, updateUser]);
 
+    const handleUpdateAvatar = useCallback(() => {
+        ImagePicker.showImagePicker({
+            title: 'Selecione um avatar',
+            cancelButtonTitle: 'Cancelar',
+            takePhotoButtonTitle: 'Usar câmera',
+            chooseFromLibraryButtonTitle: 'Escolher da galeria'
+        }, response => {
+            if (response.didCancel) {
+                return;
+            }
+            if (response.error) {
+                Alert.alert('Erro ao atualizar seu avatar.');
+                return;
+            }
+
+            const data = new FormData();
+            data.append('avatar', {
+                type: 'image/jpeg',
+                name: `${user.id}.jpg`,
+                uri: response.uri,
+            });
+            api.patch('/users/avatar', data).then(apiResponse => {
+                updateUser(apiResponse.data);
+            });
+        });
+    }, [updateUser, user.id]);
+
     const handleGoBack = useCallback(() => {
         navigation.goBack();
     }, [navigation]);
@@ -102,13 +130,16 @@ const Profile: React.FC = () => {
                 <ScrollView
                     keyboardShouldPersistTaps="handled"
                     contentContainerStyle={{ flex: 1 }}>
+
                     <Container>
+                        <UserAvatar source={{ uri: user.avatar_url }} />
                         <BackButton onPress={handleGoBack}>
-                            <Icon name="chevron-left" size={24} color="#999591" />
+                            <Icon name="chevron-left" size={24} color='#999591' />
                         </BackButton>
-                        <UserAvatarButton onPress={() => { }}>
-                            <UserAvatar source={{ uri: user.avatar_url }} />
+                        <UserAvatarButton onPress={handleUpdateAvatar}>
+                            <Icon name="camera" size={24} color='#ff9000' />
                         </UserAvatarButton>
+
                         <View>
                             <Title>Meu perfil</Title>
                         </View>
