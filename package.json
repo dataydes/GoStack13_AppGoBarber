@@ -62,6 +62,12 @@
       "./src/setupTests.ts",
       "./node_modules/react-native-gesture-handler/jestSetup.js"
     ],
+    "collectCoverageFrom": [
+      "src/pages/**/*.tsx",
+      "src/components/**/*.tsx",
+      "src/hooks/**/*.tsx",
+      "!src/hookes/index.tsx"
+    ],
     "moduleFileExtensions": [
       "ts",
       "tsx",
